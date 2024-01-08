@@ -14,7 +14,7 @@ config();
 @Module({
   imports: [AdminModule, UserModule,DatabaseModule,MongooseModule.forRootAsync({
     useFactory: () => ({
-      uri: process.env.DATABASE_CONNECTION_STRING,
+      uri: 'mongodb+srv://aktyagi18052002:5rzSG62a4L131Tf8@cluster0.zdr0pfe.mongodb.net/',
       useNewUrlParser: true,
       useUnifiedTopology: true, 
     }),

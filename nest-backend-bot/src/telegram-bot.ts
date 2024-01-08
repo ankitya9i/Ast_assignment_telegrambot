@@ -10,8 +10,8 @@ import { UserService } from './user/user.service';
 
 
 // Replace with your Telegram bot token
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const CITY = process.env.CITY;
+const TELEGRAM_BOT_TOKEN = '6719212642:AAHUpdARkQ0CNdL7NoaNm4XmPEJOB5J9Hqs';
+const CITY = 'Agra';
 
 
 // Interface to represent the expected structure of the weather API response
@@ -27,7 +27,7 @@ interface WeatherResponse {
 @Injectable()
 export class TelegramBotService {
   private bot: TelegramBot;
-  private subscribedUsers: Set<number> = new Set<number>();
+  private subscribedUsers: Set<number> = new Set < number >();
 
   constructor(private readonly adminService: AdminService, private readonly userService: UserService,) {
     
@@ -38,25 +38,29 @@ export class TelegramBotService {
     this.registerCommands();
 
     // Schedule the sendWeatherUpdates function to run every hour
+
     cron.schedule('0 * * * *', () => {
         console.log("sending update");
-        
       this.sendWeatherUpdatesToAll();
     });
   }
 
   private registerCommands() {
-    console.log("hello");
+    console.log("hello"); // regsuter the commands 
 
     this.bot.onText(/\/start/, async(msg)=>{
+
       console.log("Hello");
+
       const chatId = msg.chat.id;
+
       const first_name = msg.from.first_name
 
       this.bot.sendMessage(chatId, `Hi ${first_name}, welcome to the weather bot, you can subscribe by using the /subscribe command, and unsubscribe using /unsubscribe command}`)
       
 
     })
+
     this.bot.onText(/\/subscribe/, async (msg) => {
       console.log(msg);
       
@@ -86,11 +90,14 @@ export class TelegramBotService {
       const chatId = msg.chat.id;
   
       const existingUser = await this.userService.getUserByChatId(chatId);
+
       if (existingUser) {
         const deletedUser = await this.userService.deleteUser(chatId);
         if (deletedUser) {
+
           this.subscribedUsers.delete(chatId);
           this.bot.sendMessage(chatId, 'You have been unregistered.');
+          
         } else {
           this.bot.sendMessage(chatId, 'Unregistration failed. Please try again.');
         }
@@ -98,40 +105,9 @@ export class TelegramBotService {
         this.bot.sendMessage(chatId, 'You are not registered.');
       }
     });
-  
-
-    // this.bot.onText(/\/subscribe/, (msg) => {
-    //   const chatId = msg.chat.id;
-    //   if (this.subscribedUsers.has(chatId)) {
-    //     this.bot.sendMessage(chatId, 'You are already subscribed.');
-    //   } else {
-    //     this.subscribedUsers.add(chatId);
-    //     this.bot.sendMessage(
-    //       chatId,
-    //       'You are now subscribed to weather updates here.',
-    //     );
-    //     console.log("calling function");
-        
-    //     this.sendWeatherUpdate(chatId);
-    //   }
-    // });
-
-    // this.bot.onText(/\/unsubscribe/, (msg) => {
-    //   const chatId = msg.chat.id;
-    //   if (this.subscribedUsers.has(chatId)) {
-    //     this.subscribedUsers.delete(chatId);
-    //     this.bot.sendMessage(
-    //       chatId,
-    //       'You have unsubscribed from weather updates.',
-    //     );
-    //   } else {
-    //     this.bot.sendMessage(chatId, 'You are not subscribed.');
-    //   }
-    // });
-    
   }
 
-  private async sendWeatherUpdate(chatId: number) {
+  private async sendWeatherUpdate(chatId: number){
 
     const apiKey = this.adminService.getApiKey();
     console.log(apiKey);
@@ -142,7 +118,7 @@ export class TelegramBotService {
         `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${apiKey}`,
       );
 
-      if (!response.ok) {
+      if( !response.ok) {
         Logger.error('Failed to fetch weather data');
         return;
       }
